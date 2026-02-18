@@ -9,7 +9,7 @@
     <div class="msgs" id="msgs">
         {% for m in msgs %}
         <!-- msgs: [(bob,hi)] -->
-        <div class="msg">{{ m[0] }}: {{ m[1] }}</div>
+        <div class="msg">{{ m[0] }}: {{ m[1]|safe }}</div>
         {% endfor %}
     </div>
 

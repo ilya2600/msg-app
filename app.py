@@ -8,6 +8,10 @@ app.secret_key = "dev-secret"
 DB_PATH = "data.db"
 
 
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "secret"
+
+
 # ---------------------------
 # Инициализация базы данных
 # ---------------------------
@@ -29,6 +33,14 @@ def init_db():
             password TEXT
         )
     """)
+    
+    # Создания админ аккаунта
+    hashed = generate_password_hash(ADMIN_PASSWORD)
+
+    conn.execute(
+        "INSERT INTO users (username, password) VALUES (?, ?)",
+        (ADMIN_USERNAME, hashed)
+    )
 
     conn.commit()
     conn.close()
@@ -66,6 +78,10 @@ def index():
     conn = sqlite3.connect(DB_PATH)
     msgs = conn.execute("SELECT * FROM msgs").fetchall()
     conn.close()
+    
+    # is_admin = False
+    # user = session.get('username')
+    # if user and user == ADMIN_USERNAME
 
     return render_template('index.html', msgs=msgs)
 
@@ -83,6 +99,27 @@ def database():
     conn.close()
 
     return render_template('database.html', msgs=msgs, users=users)
+
+
+# ---------------------------
+# Админ панель
+# ---------------------------
+@app.route('/admin')
+def admin():
+    is_admin = False
+    user = session.get('username')
+    
+    if user and user == ADMIN_USERNAME:
+        is_admin = True
+    
+    if is_admin:
+        conn = sqlite3.connect(DB_PATH)
+        users = conn.execute("SELECT username FROM users").fetchall()
+        conn.close()
+        return render_template('admin.html',users=users)
+    else:
+        return "Доступ запрещен"
+    
 
 
 # ---------------------------
