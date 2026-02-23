@@ -120,6 +120,21 @@ def admin():
     else:
         return "Доступ запрещен"
     
+# ---------------------------
+# Удаление пользователей
+# ---------------------------
+@app.route('/delete_user', methods=['GET', 'POST'])
+def delete_user():
+    user = request.form['user'].strip()
+    
+    conn = sqlite3.connect(DB_PATH)
+    
+    conn.execute("DELETE FROM users WHERE username = ?", (user,))
+    
+    conn.commit()
+    conn.close()
+    
+    return user + " был удален!"
 
 
 # ---------------------------
