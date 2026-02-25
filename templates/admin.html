@@ -3,11 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin</title>
+    <style>
+        body{
+            background: #f37777d7;
+        }
+        button{
+            background: #8cf377d7;
+        }
+    </style>
 </head>
 <body>
     {% for u in users %}
-        <form action="/delete_user" method="POST">
-            <input type="text" value="{{ u[0] }}" readonly name="user"> <button>Удалить</button>
+        <form action="/delete_user" method="post">
+        <input type="text" value="{{ u[0] }}" readonly name="user">  
+        <button>Удалить.</button> 
         </form>
     {% endfor %}
 </body>

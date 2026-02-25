@@ -7,10 +7,8 @@ app.secret_key = "dev-secret"
 
 DB_PATH = "data.db"
 
-
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "secret"
-
 
 # ---------------------------
 # Инициализация базы данных
@@ -22,7 +20,8 @@ def init_db():
     conn.execute("""
         CREATE TABLE IF NOT EXISTS msgs (
             username TEXT,
-            msg TEXT
+            msg TEXT,
+            img TEXT
         )
     """)
 
@@ -33,14 +32,14 @@ def init_db():
             password TEXT
         )
     """)
-    
-    # Создания админ аккаунта
+
+    # Создание админ аккаунта
     hashed = generate_password_hash(ADMIN_PASSWORD)
 
     conn.execute(
         "INSERT INTO users (username, password) VALUES (?, ?)",
-        (ADMIN_USERNAME, hashed)
-    )
+         (ADMIN_USERNAME, hashed)
+        )
 
     conn.commit()
     conn.close()
@@ -62,12 +61,13 @@ def index():
     # POST — отправка сообщения
     if request.method == 'POST':
         msg = request.form['msg'].strip()
+        img = request.form['img'].strip()
 
         if msg:
             conn = sqlite3.connect(DB_PATH)
             conn.execute(
-                "INSERT INTO msgs (username, msg) VALUES (?, ?)",
-                (session['username'], msg)
+                "INSERT INTO msgs (username, msg, img) VALUES (?, ?, ?)",
+                (session['username'], msg, img)
             )
             conn.commit()
             conn.close()
@@ -78,28 +78,14 @@ def index():
     conn = sqlite3.connect(DB_PATH)
     msgs = conn.execute("SELECT * FROM msgs").fetchall()
     conn.close()
+
+    is_admin = False
+    user = session.get('username')
+
+    if user and user == ADMIN_USERNAME:
+        is_admin = True
     
-    # is_admin = False
-    # user = session.get('username')
-    # if user and user == ADMIN_USERNAME
-
-    return render_template('index.html', msgs=msgs)
-
-
-# ---------------------------
-# Просмотр базы (для отладки)
-# ---------------------------
-@app.route('/database')
-def database():
-    conn = sqlite3.connect(DB_PATH)
-
-    msgs = conn.execute("SELECT * FROM msgs").fetchall()
-    users = conn.execute("SELECT * FROM users").fetchall()
-
-    conn.close()
-
-    return render_template('database.html', msgs=msgs, users=users)
-
+    return render_template('index.html', msgs=msgs,is_admin=is_admin)
 
 # ---------------------------
 # Админ панель
@@ -118,8 +104,9 @@ def admin():
         conn.close()
         return render_template('admin.html',users=users)
     else:
-        return "Доступ запрещен"
-    
+        return "Доступ запрещен."
+
+
 # ---------------------------
 # Удаление пользователей
 # ---------------------------
@@ -128,13 +115,28 @@ def delete_user():
     user = request.form['user'].strip()
     
     conn = sqlite3.connect(DB_PATH)
-    
+
     conn.execute("DELETE FROM users WHERE username = ?", (user,))
-    
+
     conn.commit()
     conn.close()
-    
-    return user + " был удален!"
+
+    return user + "был удалён."
+
+
+# ---------------------------
+# Просмотр базы (для отладки)
+# ---------------------------
+@app.route('/database')
+def database():
+    conn = sqlite3.connect(DB_PATH)
+
+    msgs = conn.execute("SELECT * FROM msgs").fetchall()
+    users = conn.execute("SELECT * FROM users").fetchall()
+
+    conn.close()
+
+    return render_template('database.html', msgs=msgs, users=users)
 
 
 # ---------------------------

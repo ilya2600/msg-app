@@ -6,10 +6,18 @@
 </head>
 
 <body>
+    
+    <form action="/logout">
+        <button class="exit">Выйти</button>  
+    </form>
+
     <div class="msgs" id="msgs">
         {% for m in msgs %}
         <!-- msgs: [(bob,hi)] -->
-        <div class="msg">{{ m[0] }}: {{ m[1]|safe }}</div>
+        <div class="msg">{{ m[0] }}: {{ m[1] }} 
+            <br>
+            <img src="{{ m[2] }}" width="150px">
+        </div>
         {% endfor %}
     </div>
 
@@ -18,9 +26,16 @@
 
         <div>
             <input type="text" name="msg" required placeholder="Msg...">
+            <input type="text" name="img" placeholder="img...">
             <button>Send</button>
         </div>
     </form>
+    {% if is_admin %}
+        <form action="/admin">
+       <button class="admins">Админ</button>  
+     </form>
+
+    {% endif %}
     <script>
         document.getElementById('msgs').scrollTop = 1000000;
 
