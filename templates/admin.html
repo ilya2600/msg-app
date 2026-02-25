@@ -3,21 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-        body{
+        body {
             background: #f37777d7;
         }
-        button{
+
+        button {
             background: #8cf377d7;
         }
     </style>
 </head>
+
 <body>
+    <form action="/autoreg" method="post">
+        <input type="checkbox" name="autoreg"> Авто-регистрация <button>Применить</button>
+    </form>
+    
+    <form action="/create_user" method="post">
+        <div>{{ sysmsg }}</div>
+        <div>
+           
+            <input type="text" name="username" placeholder="User...">
+            <input type="text" name="password" placeholder="Pass..." >
+        </div>
+
+        <button>Войти</button>
+    </form>
+    
     {% for u in users %}
-        <form action="/delete_user" method="post">
-        <input type="text" value="{{ u[0] }}" readonly name="user">  
-        <button>Удалить.</button> 
-        </form>
+    <form action="/delete_user" method="post">
+        <input type="text" value="{{ u[0] }}" readonly name="user">
+        <button>Удалить.</button>
+    </form>
     {% endfor %}
-</body>
-</html>
+</body></html>
